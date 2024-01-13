@@ -92,6 +92,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "intl",
+      "rootUri": "file:///Users/felipe.santos/.pub-cache/hosted/pub.dev/intl-0.19.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "lints",
       "rootUri": "file:///Users/felipe.santos/.pub-cache/hosted/pub.dev/lints-2.1.1",
       "packageUri": "lib/",
@@ -200,7 +206,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2024-01-12T20:42:57.771910Z",
+  "generated": "2024-01-13T05:45:23.709329Z",
   "generator": "pub",
   "generatorVersion": "3.2.3"
 }

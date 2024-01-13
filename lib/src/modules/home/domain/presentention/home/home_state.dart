@@ -14,7 +14,7 @@ class HomeState extends ChangeNotifier {
   );
   HomeState.initalState()
       : error = '',
-        loading = true,
+        loading = false,
         stockIndicatorList = null;
 
   HomeState copyWith({

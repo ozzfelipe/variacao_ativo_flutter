@@ -2,12 +2,13 @@ import 'package:variacao_ativo_flutter/src/modules/home/domain/application/entit
 
 final class StockIndicatorListMapper {
   static StockIndicatorList fromMap(String stock, Map<String, dynamic> map) {
-    var chart = map['chart']['result'].first;
-    var indicatorsDate = (chart['timestamp'] as List<int>)
+    Map<String, dynamic> chart = map['chart']['result'].first;
+    var indicatorsDate = List.castFrom<dynamic, int>(chart['timestamp'])
         .map((e) => DateTime.fromMillisecondsSinceEpoch(e * 1000))
         .toList();
-    var indicatorsOpenValue =
-        (chart['indicators']['quote'].first['open'] as List<double>).toList();
+    var indicatorsOpenValue = List.castFrom<dynamic, double>(
+            chart['indicators']['quote'].first['open'])
+        .toList();
 
     return StockIndicatorList(
       stockId: stock,
