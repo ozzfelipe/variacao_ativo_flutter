@@ -15,6 +15,17 @@ class GetLast30StockIndicators extends Usecase<String, StockIndicatorList> {
     if (params.isEmpty) {
       return ArgumentsException().toFailure();
     }
-    return stockIndicatorsSource.getLast30StockIndicatorsById(params);
+    var res = await stockIndicatorsSource.getLast30StockIndicatorsById(params);
+
+    return res.fold(
+      (success) {
+        if (success.dateList.length < 30) {
+          return DataNotAvailableException().toFailure();
+        }
+
+        return success.toSuccess();
+      },
+      Failure.new,
+    );
   }
 }

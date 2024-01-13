@@ -18,28 +18,34 @@ class _LineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LineChart(
-      sampleData2,
+      lineData,
       duration: const Duration(milliseconds: 250),
     );
   }
 
-  LineChartData get sampleData2 => LineChartData(
-        lineTouchData: lineTouchData2,
+  LineChartData get lineData => LineChartData(
+        lineTouchData: lineTouchData,
         gridData: gridData,
-        titlesData: titlesData2,
+        titlesData: titlesData,
         borderData: borderData,
-        lineBarsData: lineBarsData2,
+        lineBarsData: lineBarsData,
         minX: 0,
-        maxX: 29,
-        maxY: stockData.openValueList.max,
-        minY: stockData.openValueList.min,
+        maxX: (stockData.dateList.length - 1).toDouble(),
+        maxY: stockData.openValueList.max.ceilToDouble(),
+        minY: stockData.openValueList.min.floorToDouble(),
       );
 
-  LineTouchData get lineTouchData2 => const LineTouchData(
-        enabled: false,
-      );
+  LineTouchData get lineTouchData => LineTouchData(
+      enabled: true,
+      touchTooltipData: LineTouchTooltipData(
+        tooltipBgColor: colorScheme.primary,
+        getTooltipItems: (touchedSpots) => touchedSpots
+            .map((e) => LineTooltipItem(e.y.toStringAsFixed(2),
+                TextStyle(color: colorScheme.onPrimary)))
+            .toList(),
+      ));
 
-  FlTitlesData get titlesData2 => FlTitlesData(
+  FlTitlesData get titlesData => FlTitlesData(
         bottomTitles: AxisTitles(
           sideTitles: bottomTitles,
         ),
@@ -54,8 +60,8 @@ class _LineChart extends StatelessWidget {
         ),
       );
 
-  List<LineChartBarData> get lineBarsData2 => [
-        lineChartBarData2_2,
+  List<LineChartBarData> get lineBarsData => [
+        lineChartBarData,
       ];
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
@@ -68,17 +74,20 @@ class _LineChart extends StatelessWidget {
     return Text(text, style: style, textAlign: TextAlign.center);
   }
 
-  SideTitles leftTitles() => SideTitles(
-        getTitlesWidget: leftTitleWidgets,
-        showTitles: true,
-        interval: .6,
-        reservedSize: 40,
-      );
+  SideTitles leftTitles() {
+    var diff = (stockData.openValueList.max - stockData.openValueList.min) / 3;
+
+    return SideTitles(
+      getTitlesWidget: leftTitleWidgets,
+      showTitles: true,
+      reservedSize: 40,
+    );
+  }
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: 16,
+      fontSize: 12,
     );
     DateFormat df = DateFormat('dd/MM/yy');
 
@@ -112,27 +121,19 @@ class _LineChart extends StatelessWidget {
         ),
       );
 
-  LineChartBarData get lineChartBarData2_2 => LineChartBarData(
-      isCurved: true,
-      color: colorScheme.tertiary.withOpacity(0.5),
-      barWidth: 4,
-      isStrokeCapRound: true,
-      dotData: const FlDotData(show: false),
-      belowBarData: BarAreaData(
-        show: true,
-        color: colorScheme.tertiary.withOpacity(0.2),
-      ),
-      spots: stockData.openValueList
-          .mapIndexed((index, e) => FlSpot(index.toDouble(), e))
-          .toList()
-      //  const [
-      //   FlSpot(1, 1),
-      //   FlSpot(3, 2.8),
-      //   FlSpot(7, 1.2),
-      //   FlSpot(10, 2.8),
-      //   FlSpot(12, 2.6),
-      //   FlSpot(13, 3.9),
-      // ],
+  LineChartBarData get lineChartBarData => LineChartBarData(
+        isCurved: true,
+        color: colorScheme.tertiary.withOpacity(0.5),
+        barWidth: 4,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(
+          show: true,
+          color: colorScheme.tertiary.withOpacity(0.2),
+        ),
+        spots: stockData.openValueList
+            .mapIndexed((index, e) => FlSpot(index.toDouble(), e))
+            .toList(),
       );
 }
 
@@ -156,8 +157,12 @@ class CustomLineChartState extends State<CustomLineChart> {
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
+    var isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
+    var size = MediaQuery.sizeOf(context);
+
     return AspectRatio(
-      aspectRatio: 1.23,
+      aspectRatio: isLandscape || size.width > 600 ? 1.8 : 1.23,
       child: Stack(
         children: <Widget>[
           Column(

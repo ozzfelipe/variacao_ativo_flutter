@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:variacao_ativo_flutter/src/modules/home/domain/presentention/home/home_event.dart';
 import 'package:variacao_ativo_flutter/src/modules/home/domain/presentention/home/home_state.dart';
+import 'package:variacao_ativo_flutter/src/modules/home/ui/widgets/indicators_table.dart';
 import 'package:variacao_ativo_flutter/src/modules/home/ui/widgets/line_chart.dart';
 import 'package:variacao_ativo_flutter/src/modules/home/ui/widgets/screen_loading.dart';
 
@@ -32,6 +33,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    state.addListener(() {
+      if (state.value.error.isNotEmpty) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog.adaptive(
+            title: const Text('Atenção'),
+            content: Text(state.value.error),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'))
+            ],
+          ),
+        );
+      }
+    });
     super.initState();
   }
 
@@ -55,20 +74,31 @@ class _MyHomePageState extends State<MyHomePage> {
       body: ValueListenableBuilder(
         valueListenable: state,
         builder: (_, state, child) {
+          var data = state.stockIndicatorList;
           return Stack(
             children: [
               SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.symmetric(vertical: 24),
                 child: SafeArea(
                   child: Column(
                     children: [
-                      _buildFormField(),
-                      const SizedBox(height: 80),
-                      if (state.stockIndicatorList == null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: _buildFormField(),
+                      ),
+                      if (state.stockIndicatorList == null) ...[
+                        const SizedBox(height: 80),
                         const Text('Nenhum ativo selecionado'),
-                      if (state.stockIndicatorList != null)
-                        CustomLineChart(
-                          stockData: state.stockIndicatorList!,
+                      ],
+                      if (data != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            children: [
+                              CustomLineChart(stockData: data),
+                              IndicatorsTable(data: data)
+                            ],
+                          ),
                         )
                     ],
                   ),
@@ -89,6 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
         controller: _textEditingController,
         focusNode: _focusNode,
         textCapitalization: TextCapitalization.characters,
+        autocorrect: false,
         decoration: InputDecoration(
           label: const Text('Busque um ativo'),
           border: const OutlineInputBorder(

@@ -21,5 +21,11 @@ class ArgumentsException extends AppException {
 
 class StockNotFoundException extends AppException {
   @override
-  String get message => '';
+  String get message =>
+      'Ativo não encontrado, verique o texto inserido novamente';
+}
+
+class DataNotAvailableException extends AppException {
+  @override
+  String get message => 'Dados para o ativo selecionado não encontrado';
 }
